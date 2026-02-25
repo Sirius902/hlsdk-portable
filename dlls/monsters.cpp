@@ -28,6 +28,7 @@
 #include "animation.h"
 #include "saverestore.h"
 #include "weapons.h"
+#include "doors.h"
 #include "scripted.h"
 #include "squadmonster.h"
 #include "decals.h"
@@ -1860,6 +1861,19 @@ void CBaseMonster::Move( float flInterval )
 		if( pBlocker )
 		{
 			DispatchBlocked( edict(), pBlocker->edict() );
+		}
+
+		// If blocked by a door the monster can open, open it directly.
+		// Normally monsters open doors via AdvanceRoute() -> OpenDoorAndWait()
+		// when advancing between consecutive node waypoints. With more accurate
+		// collision (e.g. xash3d-fwgs), the monster may get physically blocked
+		// before reaching the waypoint that triggers that logic.
+		if( pBlocker && ( m_afCapability & bits_CAP_OPEN_DOORS )
+		   && !FBitSet( pBlocker->pev->spawnflags, SF_DOOR_NOMONSTERS )
+		   && ( FClassnameIs( pBlocker->pev, "func_door" ) || FClassnameIs( pBlocker->pev, "func_door_rotating" ) ) )
+		{
+			m_flMoveWaitFinished = OpenDoorAndWait( pBlocker->pev );
+			return;
 		}
 
 		if( pBlocker && m_moveWaitTime > 0 && pBlocker->IsMoving() && !pBlocker->IsPlayer() && ( gpGlobals->time-m_flMoveWaitFinished ) > 3.0f )
