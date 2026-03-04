@@ -1864,12 +1864,14 @@ void CBaseMonster::Move( float flInterval )
 		}
 
 		// If blocked by a door the monster can open, open it directly.
-		// Normally monsters open doors via AdvanceRoute() -> OpenDoorAndWait()
-		// when advancing between consecutive node waypoints. With more accurate
-		// collision (e.g. xash3d-fwgs), the monster may get physically blocked
-		// before reaching the waypoint that triggers that logic.
+		// Normally monsters open doors via map triggers when they walk
+		// into the door area. With more accurate collision (e.g. xash3d-fwgs),
+		// the monster may get physically blocked before reaching the trigger.
+		// Skip doors that start open — they're already in their open position,
+		// and activating them would close them instead.
 		if( pBlocker && ( m_afCapability & bits_CAP_OPEN_DOORS )
 		   && !FBitSet( pBlocker->pev->spawnflags, SF_DOOR_NOMONSTERS )
+		   && !FBitSet( pBlocker->pev->spawnflags, SF_DOOR_START_OPEN )
 		   && ( FClassnameIs( pBlocker->pev, "func_door" ) || FClassnameIs( pBlocker->pev, "func_door_rotating" ) ) )
 		{
 			m_flMoveWaitFinished = OpenDoorAndWait( pBlocker->pev );
