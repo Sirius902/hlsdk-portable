@@ -1874,8 +1874,34 @@ void CBaseMonster::Move( float flInterval )
 		   && !FBitSet( pBlocker->pev->spawnflags, SF_DOOR_START_OPEN )
 		   && ( FClassnameIs( pBlocker->pev, "func_door" ) || FClassnameIs( pBlocker->pev, "func_door_rotating" ) ) )
 		{
-			m_flMoveWaitFinished = OpenDoorAndWait( pBlocker->pev );
-			return;
+			// Verify the route actually passes through the door by
+			// checking that the monster and waypoint are on opposite
+			// sides of the door's bounding box along its thin axis.
+			Vector vecDoorSize = pBlocker->pev->absmax - pBlocker->pev->absmin;
+			Vector vecWpt = m_Route[m_iRouteIndex].vecLocation;
+			float flMonster, flWaypoint, flDoorMin, flDoorMax;
+
+			if( vecDoorSize.x <= vecDoorSize.y )
+			{
+				flMonster = pev->origin.x;
+				flWaypoint = vecWpt.x;
+				flDoorMin = pBlocker->pev->absmin.x;
+				flDoorMax = pBlocker->pev->absmax.x;
+			}
+			else
+			{
+				flMonster = pev->origin.y;
+				flWaypoint = vecWpt.y;
+				flDoorMin = pBlocker->pev->absmin.y;
+				flDoorMax = pBlocker->pev->absmax.y;
+			}
+
+			if( ( flMonster < flDoorMin && flWaypoint > flDoorMax )
+			   || ( flMonster > flDoorMax && flWaypoint < flDoorMin ) )
+			{
+				m_flMoveWaitFinished = OpenDoorAndWait( pBlocker->pev );
+				return;
+			}
 		}
 
 		if( pBlocker && m_moveWaitTime > 0 && pBlocker->IsMoving() && !pBlocker->IsPlayer() && ( gpGlobals->time-m_flMoveWaitFinished ) > 3.0f )
