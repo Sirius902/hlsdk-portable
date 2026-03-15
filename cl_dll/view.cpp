@@ -82,6 +82,7 @@ extern Vector   dead_viewangles;
 #define CAM_MODE_FOCUS		2
 
 vec3_t v_origin, v_angles, v_cl_angles, v_sim_org, v_lastAngles;
+vec3_t v_simvel;
 float v_frametime, v_lastDistance;	
 float v_cameraRelaxAngle = 5.0f;
 float v_cameraFocusAngle = 35.0f;
@@ -780,6 +781,7 @@ void V_CalcNormalRefdef( struct ref_params_s *pparams )
 	lasttime = pparams->time;
 
 	v_origin = pparams->vieworg;
+	VectorCopy( pparams->simvel, v_simvel );
 }
 
 void V_SmoothInterpolateAngles( float * startAngle, float * endAngle, float * finalAngle, float degreesPerSec )
@@ -1384,6 +1386,7 @@ void V_CalcSpectatorRefdef( struct ref_params_s * pparams )
 
 	// refresh position
 	VectorCopy( pparams->simorg, v_sim_org );
+	VectorCopy( pparams->simvel, v_simvel );
 
 	// get old values
 	VectorCopy( pparams->cl_viewangles, v_cl_angles );

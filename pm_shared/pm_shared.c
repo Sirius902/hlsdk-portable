@@ -46,6 +46,9 @@ static int pm_shared_initialized = 0;
 
 playermove_t *pmove = NULL;
 
+float g_flJumpSpeed = 0.0f;
+int g_iJumpOccurred = 0;
+
 // Ducking time
 #define TIME_TO_DUCK		0.4f
 #define VEC_DUCK_HULL_MIN	-18
@@ -2566,6 +2569,10 @@ void PM_Jump( void )
 
 	// In the air now.
 	pmove->onground = -1;
+
+	g_flJumpSpeed = sqrt( pmove->velocity[0] * pmove->velocity[0] +
+	                      pmove->velocity[1] * pmove->velocity[1] );
+	g_iJumpOccurred = 1;
 
 	if( pmove->multiplayer )
 		bunnyjump = atoi( pmove->PM_Info_ValueForKey( pmove->physinfo, "bj" ) ) ? true : false;
