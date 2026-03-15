@@ -555,6 +555,25 @@ private:
 //
 //-----------------------------------------------------
 //
+class CHudSpeedometer : public CHudBase
+{
+public:
+	int Init( void );
+	int VidInit( void );
+	int Draw( float flTime );
+
+private:
+	cvar_t *m_pCvarSpeedometer;
+	cvar_t *m_pCvarJumpSpeed;
+	float m_flJumpSpeed;
+	float m_flPrevJumpSpeed;
+	float m_flJumpSpeedFlashTime;
+	int m_iJumpSpeedColor; // 0=neutral, 1=green, 2=red
+};
+
+//
+//-----------------------------------------------------
+//
 class CHud
 {
 private:
@@ -638,6 +657,7 @@ public:
 	CHudTextMessage m_TextMessage;
 	CHudStatusIcons m_StatusIcons;
 	CHudNightvision m_Nightvision;
+	CHudSpeedometer m_Speedometer;
 #if !USE_VGUI || USE_NOVGUI_SCOREBOARD
 	CHudScoreboard	m_Scoreboard;
 #endif

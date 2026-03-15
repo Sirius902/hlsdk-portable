@@ -416,6 +416,7 @@ void CHud::Init( void )
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
 	m_Nightvision.Init();
+	m_Speedometer.Init();
 #if USE_VGUI
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 #endif
@@ -618,6 +619,7 @@ void CHud::VidInit( void )
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
 	m_Nightvision.VidInit();
+	m_Speedometer.VidInit();
 #if USE_VGUI
 	GetClientVoiceMgr()->VidInit();
 #endif
