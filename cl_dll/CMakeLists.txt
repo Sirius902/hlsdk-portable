@@ -111,6 +111,7 @@ set (CLDLL_SOURCES
 	../pm_shared/pm_shared.c
 	saytext.cpp
 	scoreboard.cpp
+	speedometer.cpp
 	status_icons.cpp
 	statusbar.cpp
 	studio_util.cpp
