@@ -427,6 +427,7 @@ void CHud::Init( void )
 #endif
 
 	m_Menu.Init();
+	m_Speedometer.Init();
 
 	MsgFunc_ResetHUD( 0, 0, NULL );
 	ClientCmd( "richpresence_gamemode\n" );
@@ -625,6 +626,7 @@ void CHud::VidInit( void )
 #if !USE_VGUI || USE_NOVGUI_SCOREBOARD
 	m_Scoreboard.VidInit();
 #endif
+	m_Speedometer.VidInit();
 }
 
 int CHud::MsgFunc_Logo( const char *pszName,  int iSize, void *pbuf )
