@@ -59,19 +59,7 @@ int CHudSpeedometer::Init( void )
 	m_flJumpSpeedFlashTime = 0.0f;
 	m_iJumpSpeedColor = 0;
 
-	int hr, hg, hb;
-	UnpackRGB( hr, hg, hb, RGB_YELLOWISH );
-	float baseHue = RGBtoHue( hr, hg, hb );
-
-	float goodHue = 120.0f;
-	if( HueDist( goodHue, baseHue ) < 35.0f )
-		goodHue = fmod( baseHue + 120.0f, 360.0f );
-	HueToRGB( goodHue, m_iFlashGoodR, m_iFlashGoodG, m_iFlashGoodB );
-
-	float badHue = 0.0f;
-	if( HueDist( badHue, baseHue ) < 35.0f )
-		badHue = fmod( baseHue - 120.0f + 360.0f, 360.0f );
-	HueToRGB( badHue, m_iFlashBadR, m_iFlashBadG, m_iFlashBadB );
+	m_iLastBaseColor = 0;
 
 	m_iFlags |= HUD_ACTIVE;
 	gHUD.AddHudElem( this );
@@ -115,8 +103,33 @@ int CHudSpeedometer::Draw( float flTime )
 			m_iJumpSpeedColor = 0; // neutral
 	}
 
+#ifdef HIDEHUD_NOHEV
+	int baseColor = ( gHUD.m_iHideHUDDisplay & HIDEHUD_NOHEV ) ? RGB_REDISH : RGB_YELLOWISH;
+#else
+	int baseColor = RGB_YELLOWISH;
+#endif
+
+	if( baseColor != m_iLastBaseColor )
+	{
+		m_iLastBaseColor = baseColor;
+
+		int hr, hg, hb;
+		UnpackRGB( hr, hg, hb, baseColor );
+		float baseHue = RGBtoHue( hr, hg, hb );
+
+		float goodHue = 120.0f;
+		if( HueDist( goodHue, baseHue ) < 35.0f )
+			goodHue = fmod( baseHue + 120.0f, 360.0f );
+		HueToRGB( goodHue, m_iFlashGoodR, m_iFlashGoodG, m_iFlashGoodB );
+
+		float badHue = 0.0f;
+		if( HueDist( badHue, baseHue ) < 35.0f )
+			badHue = fmod( baseHue - 120.0f + 360.0f, 360.0f );
+		HueToRGB( badHue, m_iFlashBadR, m_iFlashBadG, m_iFlashBadB );
+	}
+
 	int r, g, b;
-	UnpackRGB( r, g, b, RGB_YELLOWISH );
+	UnpackRGB( r, g, b, baseColor );
 
 	// Draw current speed centered at bottom using HUD number sprites
 	int iSpeed = (int)( speed + 0.5f );
@@ -132,7 +145,7 @@ int CHudSpeedometer::Draw( float flTime )
 	if( m_pCvarJumpSpeed->value )
 	{
 		int jr, jg, jb;
-		UnpackRGB( jr, jg, jb, RGB_YELLOWISH );
+		UnpackRGB( jr, jg, jb, baseColor );
 
 		float elapsed = flTime - m_flJumpSpeedFlashTime;
 		float fadeDuration = 1.0f;
