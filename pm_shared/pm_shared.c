@@ -46,8 +46,10 @@ static int pm_shared_initialized = 0;
 
 playermove_t *pmove = NULL;
 
+#if CLIENT_DLL
 float g_flJumpSpeed = 0.0f;
 int g_iJumpOccurred = 0;
+#endif
 
 // Ducking time
 #define TIME_TO_DUCK		0.4f
@@ -2570,15 +2572,17 @@ void PM_Jump( void )
 	// In the air now.
 	pmove->onground = -1;
 
-	g_flJumpSpeed = sqrt( pmove->velocity[0] * pmove->velocity[0] +
-	                      pmove->velocity[1] * pmove->velocity[1] );
-	g_iJumpOccurred = 1;
-
 	if( pmove->multiplayer )
 		bunnyjump = atoi( pmove->PM_Info_ValueForKey( pmove->physinfo, "bj" ) ) ? true : false;
 
 	if( !bunnyjump )
 		PM_PreventMegaBunnyJumping();
+
+#if CLIENT_DLL
+	g_flJumpSpeed = sqrt( pmove->velocity[0] * pmove->velocity[0] +
+	                      pmove->velocity[1] * pmove->velocity[1] );
+	g_iJumpOccurred = 1;
+#endif
 
 	// Don't play jump sounds while frozen.
 	if( !( pmove->flags & FL_FROZEN ))
