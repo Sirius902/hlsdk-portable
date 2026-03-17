@@ -544,7 +544,7 @@ private:
 	cvar_t *m_pCvarJumpSpeed;
 	float m_flJumpSpeed;
 	float m_flPrevJumpSpeed;
-	float m_flJumpSpeedFlashTime;
+	float m_flJumpSpeedFadeRemaining;
 	int m_iJumpSpeedColor; // 0=neutral, 1=green, 2=red
 	int m_iFlashGoodR, m_iFlashGoodG, m_iFlashGoodB;
 	int m_iFlashBadR, m_iFlashBadG, m_iFlashBadB;
