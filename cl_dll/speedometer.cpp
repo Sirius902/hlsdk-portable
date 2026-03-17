@@ -94,7 +94,7 @@ int CHudSpeedometer::Init( void )
 
 	m_flJumpSpeed = 0.0f;
 	m_flPrevJumpSpeed = 0.0f;
-	m_flJumpSpeedFlashTime = 0.0f;
+	m_flJumpSpeedFadeRemaining = 0.0f;
 	m_iJumpSpeedColor = 0;
 
 	m_iLastBaseColor = 0;
@@ -131,7 +131,7 @@ int CHudSpeedometer::Draw( float flTime )
 		m_flPrevJumpSpeed = m_flJumpSpeed;
 
 		m_flJumpSpeed = g_flJumpSpeed;
-		m_flJumpSpeedFlashTime = flTime;
+		m_flJumpSpeedFadeRemaining = 1.0f;
 
 		if( m_flJumpSpeed > m_flPrevJumpSpeed )
 			m_iJumpSpeedColor = 1; // green
@@ -185,12 +185,12 @@ int CHudSpeedometer::Draw( float flTime )
 		int jr, jg, jb;
 		UnpackRGB( jr, jg, jb, baseColor );
 
-		float elapsed = flTime - m_flJumpSpeedFlashTime;
-		float fadeDuration = 1.0f;
+		if( m_flJumpSpeedFadeRemaining > 0.0f )
+			m_flJumpSpeedFadeRemaining -= gHUD.m_flTimeDelta;
 
-		if( m_iJumpSpeedColor != 0 && elapsed < fadeDuration )
+		if( m_iJumpSpeedColor != 0 && m_flJumpSpeedFadeRemaining > 0.0f )
 		{
-			float factor = elapsed / fadeDuration;
+			float factor = 1.0f - m_flJumpSpeedFadeRemaining;
 			int fr, fg, fb;
 
 			if( m_iJumpSpeedColor == 1 )
