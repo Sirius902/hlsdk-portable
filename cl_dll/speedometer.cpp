@@ -49,6 +49,44 @@ static float HueDist( float a, float b )
 	return d > 180.0f ? 360.0f - d : d;
 }
 
+static int CountDigits( int n )
+{
+	if( n <= 0 ) return 1;
+	int d = 0;
+	while( n > 0 ) { d++; n /= 10; }
+	return d;
+}
+
+static void DrawSpeedNumber( int x, int y, int iNumber, int r, int g, int b )
+{
+	int iWidth = gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).right - gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).left;
+	int digits[16];
+	int nDigits = 0;
+
+	if( iNumber <= 0 )
+	{
+		digits[0] = 0;
+		nDigits = 1;
+	}
+	else
+	{
+		int n = iNumber;
+		while( n > 0 )
+		{
+			digits[nDigits++] = n % 10;
+			n /= 10;
+		}
+	}
+
+	for( int i = nDigits - 1; i >= 0; i-- )
+	{
+		int k = digits[i];
+		SPR_Set( gHUD.GetSprite( gHUD.m_HUD_number_0 + k ), r, g, b );
+		SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect( gHUD.m_HUD_number_0 + k ) );
+		x += iWidth;
+	}
+}
+
 int CHudSpeedometer::Init( void )
 {
 	m_pCvarSpeedometer = CVAR_CREATE( "hud_speedometer", "0", FCVAR_ARCHIVE );
@@ -134,12 +172,12 @@ int CHudSpeedometer::Draw( float flTime )
 	// Draw current speed centered at bottom using HUD number sprites
 	int iSpeed = (int)( speed + 0.5f );
 	int iDigitWidth = gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).right - gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).left;
-	int iNumDigits = gHUD.GetNumWidth( iSpeed, DHN_DRAWZERO );
+	int iNumDigits = CountDigits( iSpeed );
 	int iTotalWidth = iNumDigits * iDigitWidth;
 	int x = ( ScreenWidth - iTotalWidth ) / 2;
 	int y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 
-	gHUD.DrawHudNumber( x, y + gHUD.m_iHudNumbersYOffset, DHN_DRAWZERO, iSpeed, r, g, b );
+	DrawSpeedNumber( x, y + gHUD.m_iHudNumbersYOffset, iSpeed, r, g, b );
 
 	// Draw jump speed if enabled
 	if( m_pCvarJumpSpeed->value )
@@ -170,12 +208,12 @@ int CHudSpeedometer::Draw( float flTime )
 		}
 
 		int iJumpSpeed = (int)( m_flJumpSpeed + 0.5f );
-		int iJsDigits = gHUD.GetNumWidth( iJumpSpeed, DHN_DRAWZERO );
+		int iJsDigits = CountDigits( iJumpSpeed );
 		int iJsWidth = iJsDigits * iDigitWidth;
 		int jx = ( ScreenWidth - iJsWidth ) / 2;
 		int jy = y - gHUD.m_iFontHeight;
 
-		gHUD.DrawHudNumber( jx, jy + gHUD.m_iHudNumbersYOffset, DHN_DRAWZERO, iJumpSpeed, jr, jg, jb );
+		DrawSpeedNumber( jx, jy + gHUD.m_iHudNumbersYOffset, iJumpSpeed, jr, jg, jb );
 	}
 
 	return 1;
