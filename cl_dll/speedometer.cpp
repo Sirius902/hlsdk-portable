@@ -10,6 +10,8 @@ extern "C" {
 extern int g_iUser1;
 extern vec3_t v_simvel;
 
+// Hue-only helpers (S=1, V=1): flash colors are meant to be vivid,
+// and HUD hue is only used for conflict detection.
 static float RGBtoHue( int r, int g, int b )
 {
 	float fr = r / 255.0f, fg = g / 255.0f, fb = b / 255.0f;
