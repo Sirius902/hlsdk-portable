@@ -59,6 +59,7 @@ static int CountDigits( int n )
 	return d;
 }
 
+// DrawHudNumber is hard-coded for 3 digits max, but speed values can exceed 999.
 static void DrawSpeedNumber( int x, int y, int iNumber, int r, int g, int b )
 {
 	int iWidth = gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).right - gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).left;
