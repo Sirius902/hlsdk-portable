@@ -10,6 +10,45 @@ extern "C" {
 extern int g_iUser1;
 extern vec3_t v_simvel;
 
+static float RGBtoHue( int r, int g, int b )
+{
+	float fr = r / 255.0f, fg = g / 255.0f, fb = b / 255.0f;
+	float maxc = Q_max( fr, Q_max( fg, fb ) );
+	float minc = Q_min( fr, Q_min( fg, fb ) );
+	float delta = maxc - minc;
+	if( delta == 0 ) return 0;
+	float hue;
+	if( maxc == fr )      hue = 60.0f * fmod( ( fg - fb ) / delta, 6.0f );
+	else if( maxc == fg ) hue = 60.0f * ( ( fb - fr ) / delta + 2.0f );
+	else                  hue = 60.0f * ( ( fr - fg ) / delta + 4.0f );
+	if( hue < 0 ) hue += 360.0f;
+	return hue;
+}
+
+static void HueToRGB( float hue, int &r, int &g, int &b )
+{
+	float h = fmod( hue, 360.0f );
+	if( h < 0 ) h += 360.0f;
+	int sector = (int)( h / 60.0f );
+	float f = h / 60.0f - sector;
+	int q = (int)( ( 1.0f - f ) * 255 );
+	int t = (int)( f * 255 );
+	switch( sector ) {
+	case 0: r = 255; g = t;   b = 0;   break;
+	case 1: r = q;   g = 255; b = 0;   break;
+	case 2: r = 0;   g = 255; b = t;   break;
+	case 3: r = 0;   g = q;   b = 255; break;
+	case 4: r = t;   g = 0;   b = 255; break;
+	default:r = 255; g = 0;   b = q;   break;
+	}
+}
+
+static float HueDist( float a, float b )
+{
+	float d = fabs( a - b );
+	return d > 180.0f ? 360.0f - d : d;
+}
+
 int CHudSpeedometer::Init( void )
 {
 	m_pCvarSpeedometer = CVAR_CREATE( "hud_speedometer", "0", FCVAR_ARCHIVE );
@@ -19,6 +58,20 @@ int CHudSpeedometer::Init( void )
 	m_flPrevJumpSpeed = 0.0f;
 	m_flJumpSpeedFlashTime = 0.0f;
 	m_iJumpSpeedColor = 0;
+
+	int hr, hg, hb;
+	UnpackRGB( hr, hg, hb, RGB_YELLOWISH );
+	float baseHue = RGBtoHue( hr, hg, hb );
+
+	float goodHue = 120.0f;
+	if( HueDist( goodHue, baseHue ) < 35.0f )
+		goodHue = fmod( baseHue + 120.0f, 360.0f );
+	HueToRGB( goodHue, m_iFlashGoodR, m_iFlashGoodG, m_iFlashGoodB );
+
+	float badHue = 0.0f;
+	if( HueDist( badHue, baseHue ) < 35.0f )
+		badHue = fmod( baseHue - 120.0f + 360.0f, 360.0f );
+	HueToRGB( badHue, m_iFlashBadR, m_iFlashBadG, m_iFlashBadB );
 
 	m_iFlags |= HUD_ACTIVE;
 	gHUD.AddHudElem( this );
@@ -91,11 +144,11 @@ int CHudSpeedometer::Draw( float flTime )
 
 			if( m_iJumpSpeedColor == 1 )
 			{
-				fr = 0; fg = 255; fb = 0;
+				fr = m_iFlashGoodR; fg = m_iFlashGoodG; fb = m_iFlashGoodB;
 			}
 			else
 			{
-				fr = 255; fg = 0; fb = 0;
+				fr = m_iFlashBadR; fg = m_iFlashBadG; fb = m_iFlashBadB;
 			}
 
 			jr = fr + (int)( ( jr - fr ) * factor );
