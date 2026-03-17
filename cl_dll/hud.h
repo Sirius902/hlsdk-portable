@@ -546,6 +546,8 @@ private:
 	float m_flPrevJumpSpeed;
 	float m_flJumpSpeedFlashTime;
 	int m_iJumpSpeedColor; // 0=neutral, 1=green, 2=red
+	int m_iFlashGoodR, m_iFlashGoodG, m_iFlashGoodB;
+	int m_iFlashBadR, m_iFlashBadG, m_iFlashBadB;
 };
 
 //
