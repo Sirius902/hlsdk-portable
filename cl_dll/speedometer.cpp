@@ -16,7 +16,7 @@ static float RGBtoHue( int r, int g, int b )
 	float maxc = Q_max( fr, Q_max( fg, fb ) );
 	float minc = Q_min( fr, Q_min( fg, fb ) );
 	float delta = maxc - minc;
-	if( delta == 0 ) return 0;
+	if( delta < 1e-6f ) return 0;
 	float hue;
 	if( maxc == fr )      hue = 60.0f * fmod( ( fg - fb ) / delta, 6.0f );
 	else if( maxc == fg ) hue = 60.0f * ( ( fb - fr ) / delta + 2.0f );
